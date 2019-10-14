@@ -5,7 +5,6 @@ class LinkedList {
         this.length = 0;
         this._head = null;
         this._tail = null;
-        this.indexArray = [];
     }
   
     append(data) {
@@ -28,7 +27,7 @@ class LinkedList {
             }
             this.length++;
         }
-        this.indexArray.push(tempNode);
+        // this
         return this;
     }
   
@@ -47,20 +46,37 @@ class LinkedList {
     }
   
     at(index) {
-        return this.indexArray[index].data;
+        var i = 0;
+        var tempNode = this._head;
+        while (i != index) {
+            i++;
+            tempNode = tempNode.next;
+        }
+        return tempNode.data;
     }
   
     insertAt(index, data) {
         if (index == 0) {
-          this.append(data);
+            if (this._head == null ) {
+                this.append(data);
+            }
+            else {
+                var tempNode = this._head;
+                this._head = new Node(data, null, tempNode);
+                tempNode.prev = this._head;
+            }
           return this;
         }
-        var tempNode = new Node(data, this.indexArray[index - 1], this.indexArray[index]);
-        this.indexArray[index - 1].next = tempNode;
-        this.indexArray[index].prev = tempNode;
-        this.indexArray.splice(index, 0, tempNode);
-        this.length++;
-        return this;
+        var tempNode = this._head;
+        for (var i = 0; i < this.length; i++) {
+            if (i == index) {
+                var insertNode = new Node (data, tempNode.prev, tempNode);
+                tempNode.prev.next = insertNode;
+                tempNode.prev = insertNode;
+                return this;
+            }
+            tempNode = tempNode.next;
+        }
     }
   
     isEmpty() {
@@ -74,65 +90,59 @@ class LinkedList {
         this._head = null;
         this._tail = null;
         this.length = 0;
-        this.indexArray = [];
         return this;
     }
   
     deleteAt(index) {
         if (index == 0) {
-          this.indexArray.splice(index, 1);
-          this.length--;
-          if (this.indexArray.length != 0) {
-            this.indexArray[index].prev = this.indexArray[index - 1];
-          }
-          return this;
+            var tempNode = this._head.next;
+            this.head = tempNode;
+            this.length--;
+            return this;
         }
         if (index == (this.length - 1)) {
-          this.indexArray.splice(index, 1);
-          this.length--;
-          this.indexArray[index - 1].next = null;
+            var tempNode = this._tail.prev;
+            this.tail = tempNode;
+            this.length--;
+            return this;
         }
-        this.indexArray.splice(index, 1);
-        this.indexArray[index - 1].next = this.indexArray[index];
-        this.indexArray[index].prev = this.indexArray[index - 1];
-        this.length--;
+        var tempNode = this._head;
+        for (var i = 0; i < this.length; i++) {
+            if (index == i) {
+                var deleteNode = tempNode;
+                tempNode.prev.next = deleteNode.next;
+                deleteNode.next.prev = tempNode.prev;
+                this.length--;
+                return this;
+            }
+            tempNode = tempNode.next;
+        }
         return this;
     }
   
     reverse() {
-        var nodeArray = this.indexArray;
+        var data = [];
+        var tempNode = this._head;
+        while (tempNode != null) {
+            data.push(tempNode.data);
+            tempNode = tempNode.next;
+        }
+        data = data.reverse();
         this.clear();
-        for (var i = nodeArray.length - 1; i >= 0; i--) {
-            var tempNode = nodeArray[i];
-            if (this.length == 0) {
-                this._head = tempNode;
-                this._tail = tempNode;
-                this.length++;
-            }
-            else {
-                if (this._head == this._tail) {
-                    this._head.next = tempNode;
-                    tempNode.prev = this._head;
-                    this._tail = tempNode;
-                }
-                else {
-                    this._tail.next = tempNode;
-                    tempNode.prev = this._tail;
-                    this._tail = tempNode; 
-                }
-                this.length++;
-            }
-            this.indexArray.push(tempNode);
+        for (var i = 0; i < data.length; i++) {
+            this.append(data[i]);
         }
         return this;
     }
   
     indexOf(data) {
         var tempNode = this._head;
+        var index = 0;
         while (tempNode != null) {
             if (tempNode.data == data) {
-                return this.indexArray.indexOf(tempNode);
+                return index;
             }
+            index++;
             tempNode = tempNode.next;
         }
         return -1;
